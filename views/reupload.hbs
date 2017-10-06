@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <script type="text/javascript">
+    $(document).ready(() => {
+        viewFiles();
+    });
+
+    function accept(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/acceptFile',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+
+    }
+
+    function download(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/download',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                window.open(result.paper_url);
+                window.open(result.gradeSheetManuscripts_url);
+                window.open(result.reviewerComments_url);
+                viewFiles();
+            }
+        });
+    }
+
+    function upload(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/uploadReview',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+    }
+
+    function reject(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/rejectFile',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+    }
+
+    function viewFiles() {
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/reupload',
+            type: 'POST',
+            success: result => {
+                console.log(result);
+                $("#files").html("<b><u>Files:</b></u> <br>");
+                $("#files").append("<table>");
+                for (var i = 0; i < result.files.length; i++) {
+                    $("#files").append("<tr>");
+                    $("#files").append("<button onclick=window.location.href=\"/upload/"+result.files[i].key+"\">"+result.files[i].filename+"</button>");
+                    $("#files").append("</tr>");
+                }
+
+                $("#files").append("</table>");
+            }
+        });
+    }
+    </script>
+</head>
+
+<body>
+    <button onclick="window.location.href='/'">Back</button>
+    <button class="button-css" onclick="viewFiles()">View Files</button>
+    <p id="files" />
+    <p>{{email}}</p>
+</body>
+
+</html>

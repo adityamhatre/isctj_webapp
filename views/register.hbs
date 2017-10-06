@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <script>
+    // wait for the DOM to be loaded 
+    $(document).ready(function() {
+        var options = {
+            beforeSubmit: showRequest, // pre-submit callback 
+            success: showResponse // post-submit callback 
+        };
+
+        // bind to the form's submit event 
+        $('#registerForm').submit(function() {
+            if ($('#password').val() == $('#confirm_password').val()) {
+                $(this).ajaxSubmit(options);
+            } else {
+                $("#status").html("Passwords do not match");
+            }
+
+            return false; // always return false to prevent standard browser submit and page navigation return false; 
+        });
+    });
+
+    // pre-submit callback 
+    function showRequest(formData, jqForm, options) {
+        $("#status").html('Please wait...');
+        return true;
+    }
+
+    // post-submit callback 
+    function showResponse(responseText, statusText, xhr, $form) {
+        alert(resposeText.status);
+        if (responseText.status == 'register_success') {
+            $("#status").html(responseText.message);
+        }
+        if (responseText.status == 'register_fail') {
+            $("#status").html(responseText.message);
+        }
+        $("#status").html(responseText.message);
+    }
+    </script>
+</head>
+
+<body>
+    <h1>Welcome to ISCTJ backend.</h1>
+    <h3>Enter your details to continue</h3>
+    <form action="/api/register" method="post" id="registerForm">
+        <input class="beautiful_input" type="text" name="email" placeholder="Email" value="aditya.r.mhatre@gmail.com">
+        <br>
+        <br>
+        <input class="beautiful_input" type="password" id="password" name="password" placeholder="Password" value="password">
+        <br>
+        <br>
+        <input class="beautiful_input" type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" value="password">
+        <br>
+        <br>
+        <input class="button-css" type="submit" name="register" value="Register">
+    </form>
+    <br>
+    <button onclick="window.location.href='/'">Back</button>
+    <p id="status"></p>
+</body>
+
+</html>

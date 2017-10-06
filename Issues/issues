@@ -1,0 +1,4 @@
+FIX: File exchange mechanism.
+ADDON: Only comments need to be in the attachment for rejection.
+ADDON: Preview of uploaded files.
+ADDON: Client side validation for filename

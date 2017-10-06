@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <script>
+    // wait for the DOM to be loaded 
+    $(document).ready(function() {
+
+        var options = {
+            beforeSubmit: showRequest, // pre-submit callback 
+            success: showResponse // post-submit callback 
+        };
+
+        // bind to the form's submit event 
+        $('#loginForm').submit(function() {
+            $(this).ajaxSubmit(options);
+            return false; // always return false to prevent standard browser submit and page navigation return false; 
+        });
+    });
+
+    // pre-submit callback 
+    function showRequest(formData, jqForm, options) {
+        $("#status").html('Please wait...');
+        return true;
+    }
+
+    // post-submit callback 
+    function showResponse(responseText, statusText, xhr, $form) {
+
+        if (responseText.status == 'login_success') {
+            window.location.href = responseText.message;
+        }
+        if (responseText.status == 'login_fail') {
+            $("#status").html(responseText.message);
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <h1>Welcome to ISCTJ backend.</h1> {{# if loggedIn }}
+    <button class="button-css" onclick="window.location.href='/logout'">Logout</button>
+    <button class="button-css" onclick="window.location.href='/upload'">Upload Files</button>
+    <button class="button-css" onclick="window.location.href='/reupload'">Reupload Files</button>
+    {{# if normalUser}} {{else}}
+    <button class="button-css" onclick="window.location.href='/review'">Review Files</button>
+    {{/if}} {{ else }}
+    <h3>Enter your details to continue or <a href="/register">Register</a></h3>
+    <form action="/api/login" method="post" id="loginForm">
+        <input class="beautiful_input" type="text" name="email" placeholder="Email" value="aditya.r.mhatre@gmail.com">
+        <br>
+        <br>
+        <input class="beautiful_input" type="password" name="password" placeholder="Password" value="password">
+        <br>
+        <br>
+        <input class="button-css" type="submit" name="login" value="Login">
+    </form>
+    {{/if}}
+    <br>
+    <p id="status"></p>
+</body>
+
+</html>

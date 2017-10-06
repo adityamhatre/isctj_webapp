@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+    <script type="text/javascript">
+    $(document).ready(() => {
+        viewFiles();
+        var value="v01.n01.03";
+        if (value == null) {
+            value = "v01.n01.01";
+        }
+        var dois = value.split(".");
+        if (dois[2] == "01") dois[2] = "02";
+        else if (dois[2] == "02") dois[2] = "03";
+        else if (dois[2] == "03") {
+            dois[2] = "01";
+            if (dois[1] == "n01") dois[1] = "n02";
+            else if (dois[1] == "n02") dois[1] = "n03";
+            else if (dois[1] == "n03") dois[1] = "n04";
+            else if (dois[1] == "n04") dois[1] = "n05";
+            else if (dois[1] == "n05") dois[1] = "n06";
+            else if (dois[1] == "n06") dois[1] = "n07";
+            else if (dois[1] == "n07") dois[1] = "n08";
+            else if (dois[1] == "n08") dois[1] = "n09";
+            else if (dois[1] == "n09") dois[1] = "n10";
+            else if (dois[1] == "n10") dois[1] = "n11";
+            else if (dois[1] == "n11") dois[1] = "n12";
+            else if (dois[1] == "n12") dois[1] = "n01";
+        }
+
+        if (dois[1] == "12") {
+            dois[1] = "01";
+            if (dois[0] == "v01") dois[0] = "v02";
+            else if (dois[0] == "v02") dois[0] = "v03";
+            else if (dois[0] == "v03") dois[0] = "v04";
+            else if (dois[0] == "v04") dois[0] = "v05";
+            else if (dois[0] == "v05") dois[0] = "v06";
+            else if (dois[0] == "v06") dois[0] = "v07";
+            else if (dois[0] == "v07") dois[0] = "v08";
+            else if (dois[0] == "v08") dois[0] = "v09";
+            else if (dois[0] == "v09") dois[0] = "v10";
+            else if (dois[0] == "v10") dois[0] = "v11";
+            else if (dois[0] == "v11") dois[0] = "v12";
+            else if (dois[0] == "v12") dois[0] = "v13";
+        }
+        var final_doi = dois.join(".");
+        console.log(final_doi);
+    });
+
+    function accept(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/acceptFile',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+
+    }
+
+    function download(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/download',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                window.open(result.paper_url);
+                window.open(result.gradeSheetManuscripts_url);
+                window.open(result.reviewerComments_url);
+                viewFiles();
+            }
+        });
+    }
+
+    function upload(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/uploadReview',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+    }
+
+    function reject(key) {
+        var sendObj = {
+            key: key
+        };
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/rejectFile',
+            type: 'POST',
+            datatype: 'JSON',
+            data: sendObj,
+            success: result => {
+                viewFiles();
+            }
+        });
+    }
+
+    function viewFiles() {
+        $.ajax({
+            beforeSend: () => $("#files").html('Please wait...'),
+            url: '/api/viewFiles',
+            type: 'POST',
+            success: result => {
+                console.log(result);
+                $("#files").html("<b><u>Assigned Files:</b></u> <br>");
+                $("#files").append("<table>");
+                for (var i = 0; i < result.files.length; i++) {
+                    $("#files").append("<tr>");
+                    $("#files").append("<td><b>" + result.files[i].filename + "</b> (" + result.files[i].email + ")</td><td><button onclick=\"accept('" + result.files[i].key.trim() + "')\">Accept</button></td><td><button onclick=\"reject('" + result.files[i].key.trim() + "')\">Reject</button><td><button onclick=\"download('" + result.files[i].key.trim() + "')\">Download</button></td>");
+                    $("#files").append("</tr>");
+                    $("#files").append("<tr>");
+                    $("#files").append("Review: <form id=\"uploader_form\" enctype=\"multipart/form-data\" action=\"api/reviewUpload/\" method=\"post\"><input class=\"button-css\"  type=\"file\" name=\"review_doc\" /><input name=\"key\" type=\"hidden\" value=\"" + result.files[i].key.trim() + "\"><input class=\"button-css\" type=\"submit\" name=\"submit\" id=\"btnSubmit\" value=\"Upload\" /></form><br><br>");
+                    $("#files").append("</tr>");
+                }
+
+                $("#files").append("</table>");
+            }
+        });
+    }
+    </script>
+</head>
+
+<body>
+    <button onclick="window.location.href='/'">Back</button>
+    <button class="button-css" onclick="viewFiles()">View Files</button>
+    <p id="files" />
+    <p>{{email}}</p>
+</body>
+
+</html>
